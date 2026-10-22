@@ -92,7 +92,7 @@ export const Introduction = ({ openAiKey, onChangeAiKey }: Props) => {
           </div>
           <div className="my-16">
             入力されたAPIキーで、ブラウザから直接OpenAIのAPIを利用しますので、サーバー等には保存されません。
-            なお、利用しているモデルはGPT-3です。
+            なお、利用しているモデルはGPT-6 Lunaです。
             <br />
             ※APIキーや会話文はピクシブのサーバーに送信されません。
           </div>

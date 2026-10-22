@@ -1,11 +1,17 @@
 /** @type {import('next').NextConfig} */
+const basePath = process.env.BASE_PATH || "";
+
 const nextConfig = {
+  output: "export",
   reactStrictMode: true,
-  assetPrefix: process.env.BASE_PATH || "",
-  basePath: process.env.BASE_PATH || "",
+  assetPrefix: basePath,
+  basePath,
   trailingSlash: true,
-  publicRuntimeConfig: {
-    root: process.env.BASE_PATH || "",
+  env: {
+    NEXT_PUBLIC_BASE_PATH: basePath,
+  },
+  images: {
+    unoptimized: true,
   },
 };
 

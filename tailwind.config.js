@@ -1,4 +1,4 @@
-const { light, dark } = require("@charcoal-ui/theme");
+const { light } = require("@charcoal-ui/theme");
 const { createTailwindConfig } = require("@charcoal-ui/tailwind-config");
 /**
  * @type {import('tailwindcss/tailwind-config').TailwindConfig}
@@ -34,5 +34,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require("@tailwindcss/line-clamp")],
+  plugins: [],
 };

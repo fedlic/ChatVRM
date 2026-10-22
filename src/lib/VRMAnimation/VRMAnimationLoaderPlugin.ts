@@ -4,7 +4,6 @@ import {
   GLTFLoaderPlugin,
   GLTFParser,
 } from "three/examples/jsm/loaders/GLTFLoader";
-import { VRMAnimationLoaderPluginOptions } from "./VRMAnimationLoaderPluginOptions";
 import { GLTF as GLTFSchema } from "@gltf-transform/core";
 import { VRMCVRMAnimation } from "./VRMCVRMAnimation";
 import { VRMHumanBoneName, VRMHumanBoneParentMap } from "@pixiv/three-vrm";
@@ -32,10 +31,7 @@ type VRMAnimationLoaderPluginWorldMatrixMap = Map<
 export class VRMAnimationLoaderPlugin implements GLTFLoaderPlugin {
   public readonly parser: GLTFParser;
 
-  public constructor(
-    parser: GLTFParser,
-    options?: VRMAnimationLoaderPluginOptions
-  ) {
+  public constructor(parser: GLTFParser) {
     this.parser = parser;
   }
 
@@ -98,7 +94,6 @@ export class VRMAnimationLoaderPlugin implements GLTFLoaderPlugin {
   ): VRMAnimationLoaderPluginNodeMap {
     const humanoidIndexToName: Map<number, VRMHumanBoneName> = new Map();
     const expressionsIndexToName: Map<number, string> = new Map();
-    let lookAtIndex: number | null;
 
     // humanoid
     const humanBones = defExtension.humanoid?.humanBones;
@@ -130,7 +125,7 @@ export class VRMAnimationLoaderPlugin implements GLTFLoaderPlugin {
     }
 
     // lookAt
-    lookAtIndex = defExtension.lookAt?.node ?? null;
+    const lookAtIndex = defExtension.lookAt?.node ?? null;
 
     return { humanoidIndexToName, expressionsIndexToName, lookAtIndex };
   }

@@ -1,4 +1,4 @@
-import { VRMExpression, VRMExpressionPresetName } from "@pixiv/three-vrm";
+import { VRMExpressionPresetName } from "@pixiv/three-vrm";
 import { KoeiroParam } from "../constants/koeiroParam";
 
 // ChatGPT API
@@ -7,15 +7,13 @@ export type Message = {
   content: string;
 };
 
-const talkStyles = [
-  "talk",
-  "happy",
-  "sad",
-  "angry",
-  "fear",
-  "surprised",
-] as const;
-export type TalkStyle = (typeof talkStyles)[number];
+export type TalkStyle =
+  | "talk"
+  | "happy"
+  | "sad"
+  | "angry"
+  | "fear"
+  | "surprised";
 
 export type Talk = {
   style: TalkStyle;

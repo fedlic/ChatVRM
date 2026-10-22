@@ -4,36 +4,36 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
-    "export": "next export",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "dependencies": {
-    "@charcoal-ui/icons": "^2.6.0",
-    "@tailwindcss/line-clamp": "^0.4.4",
-    "@types/dom-speech-recognition": "^0.0.1",
-    "eslint": "8.36.0",
-    "eslint-config-next": "13.2.4",
-    "next": "13.2.4",
-    "node-fetch": "^3.3.1",
-    "openai": "^3.2.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "three": "^0.149.0",
-    "typescript": "5.0.2"
+    "@charcoal-ui/icons": "^6.3.0",
+    "@types/dom-speech-recognition": "^0.0.12",
+    "next": "^16.4.2",
+    "openai": "^7.42.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "three": "^0.149.0"
   },
   "devDependencies": {
     "@charcoal-ui/tailwind-config": "^2.6.0",
+    "@eslint/js": "^10.0.1",
     "@gltf-transform/core": "^2.4.6",
     "@pixiv/three-vrm": "^1.0.9",
-    "@types/node": "18.15.10",
-    "@types/react": "18.0.29",
-    "@types/react-dom": "18.0.11",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^22.19.19",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "@types/three": "0.149.0",
-    "autoprefixer": "^10.4.14",
-    "postcss": "^8.4.21",
-    "tailwindcss": "^3.3.1"
+    "autoprefixer": "^10.6.1",
+    "eslint": "^10.13.0",
+    "globals": "^17.13.0",
+    "postcss": "^8.5.31",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.0"
   },
   "engines": {
     "node": ">=22.13.0"
