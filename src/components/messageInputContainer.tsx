@@ -1,5 +1,5 @@
 import { MessageInput } from "@/components/messageInput";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 type Props = {
   isChatProcessing: boolean;
@@ -17,8 +17,7 @@ export const MessageInputContainer = ({
   onChatProcessStart,
 }: Props) => {
   const [userMessage, setUserMessage] = useState("");
-  const [speechRecognition, setSpeechRecognition] =
-    useState<SpeechRecognition>();
+  const speechRecognition = useRef<SpeechRecognition | null>(null);
   const [isMicRecording, setIsMicRecording] = useState(false);
 
   // 音声認識の結果を処理する
@@ -29,7 +28,7 @@ export const MessageInputContainer = ({
 
       // 発言の終了時
       if (event.results[0].isFinal) {
-        setUserMessage(text);
+        setUserMessage("");
         // 返答文の生成を開始
         onChatProcessStart(text);
       }
@@ -44,17 +43,18 @@ export const MessageInputContainer = ({
 
   const handleClickMicButton = useCallback(() => {
     if (isMicRecording) {
-      speechRecognition?.abort();
+      speechRecognition.current?.abort();
       setIsMicRecording(false);
 
       return;
     }
 
-    speechRecognition?.start();
+    speechRecognition.current?.start();
     setIsMicRecording(true);
-  }, [isMicRecording, speechRecognition]);
+  }, [isMicRecording]);
 
   const handleClickSendButton = useCallback(() => {
+    setUserMessage("");
     onChatProcessStart(userMessage);
   }, [onChatProcessStart, userMessage]);
 
@@ -70,14 +70,15 @@ export const MessageInputContainer = ({
     recognition.addEventListener("result", handleRecognitionResult);
     recognition.addEventListener("end", handleRecognitionEnd);
 
-    setSpeechRecognition(recognition);
-  }, [handleRecognitionResult, handleRecognitionEnd]);
+    speechRecognition.current = recognition;
 
-  useEffect(() => {
-    if (!isChatProcessing) {
-      setUserMessage("");
-    }
-  }, [isChatProcessing]);
+    return () => {
+      recognition.removeEventListener("result", handleRecognitionResult);
+      recognition.removeEventListener("end", handleRecognitionEnd);
+      recognition.abort();
+      speechRecognition.current = null;
+    };
+  }, [handleRecognitionResult, handleRecognitionEnd]);
 
   return (
     <MessageInput

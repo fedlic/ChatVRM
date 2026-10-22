@@ -1,29 +1,30 @@
-import { Configuration, OpenAIApi } from "openai";
+import OpenAI from "openai";
+import type { ResponseInputItem } from "openai/resources/responses/responses";
 import { Message } from "../messages/messages";
+
+const MODEL = "gpt-6-luna";
+
+const toResponseInput = (messages: Message[]): ResponseInputItem[] => messages;
 
 export async function getChatResponse(messages: Message[], apiKey: string) {
   if (!apiKey) {
     throw new Error("Invalid API Key");
   }
 
-  const configuration = new Configuration({
-    apiKey: apiKey,
-  });
-  // ブラウザからAPIを叩くときに発生するエラーを無くすworkaround
-  // https://github.com/openai/openai-node/issues/6#issuecomment-1492814621
-  delete configuration.baseOptions.headers["User-Agent"];
-
-  const openai = new OpenAIApi(configuration);
-
-  const { data } = await openai.createChatCompletion({
-    model: "gpt-3.5-turbo",
-    messages: messages,
+  const openai = new OpenAI({
+    apiKey,
+    dangerouslyAllowBrowser: true,
   });
 
-  const [aiRes] = data.choices;
-  const message = aiRes.message?.content || "エラーが発生しました";
+  const response = await openai.responses.create({
+    model: MODEL,
+    input: toResponseInput(messages),
+    max_output_tokens: 200,
+    reasoning: { effort: "none" },
+    store: false,
+  });
 
-  return { message: message };
+  return { message: response.output_text || "エラーが発生しました" };
 }
 
 export async function getChatResponseStream(
@@ -34,53 +35,32 @@ export async function getChatResponseStream(
     throw new Error("Invalid API Key");
   }
 
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${apiKey}`,
-  };
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    headers: headers,
-    method: "POST",
-    body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: messages,
-      stream: true,
-      max_tokens: 200,
-    }),
+  const openai = new OpenAI({
+    apiKey,
+    dangerouslyAllowBrowser: true,
   });
 
-  const reader = res.body?.getReader();
-  if (res.status !== 200 || !reader) {
-    throw new Error("Something went wrong");
-  }
+  const responseStream = await openai.responses.create({
+    model: MODEL,
+    input: toResponseInput(messages),
+    max_output_tokens: 200,
+    reasoning: { effort: "none" },
+    store: false,
+    stream: true,
+  });
 
-  const stream = new ReadableStream({
-    async start(controller: ReadableStreamDefaultController) {
-      const decoder = new TextDecoder("utf-8");
+  return new ReadableStream<string>({
+    async start(controller) {
       try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          const data = decoder.decode(value);
-          const chunks = data
-            .split("data:")
-            .filter((val) => !!val && val.trim() !== "[DONE]");
-          for (const chunk of chunks) {
-            const json = JSON.parse(chunk);
-            const messagePiece = json.choices[0].delta.content;
-            if (!!messagePiece) {
-              controller.enqueue(messagePiece);
-            }
+        for await (const event of responseStream) {
+          if (event.type === "response.output_text.delta") {
+            controller.enqueue(event.delta);
           }
         }
+        controller.close();
       } catch (error) {
         controller.error(error);
-      } finally {
-        reader.releaseLock();
-        controller.close();
       }
     },
   });
-
-  return stream;
 }
